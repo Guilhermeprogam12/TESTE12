@@ -67,65 +67,71 @@
 </head>
 <body>
 
-    <h1>Você é hetero?</h1>
+    <h1>Você é Hetero?</h1>
     
     <div class="buttons-container">
         <button id="button1" class="button">Sim</button>
         <button id="button2" class="button">Não</button>
     </div>
+<script>
+    const buttonToMove = document.getElementById('button1');
+    const buttonStatic = document.getElementById('button2');
 
-    <script>
-        const buttons = document.querySelectorAll('.button');
+    // Função para o movimento do mouse
+    function moveButton(event) {
+        const mouseX = event.clientX;
+        const mouseY = event.clientY;
+
+        const buttonRect = buttonToMove.getBoundingClientRect();
+        const buttonCenterX = buttonRect.left + buttonRect.width / 2;
+        const buttonCenterY = buttonRect.top + buttonRect.height / 2;
+
+        const distanceX = mouseX - buttonCenterX;
+        const distanceY = mouseY - buttonCenterY;
+        const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+        const repelDistance = 250; // Área de repulsão
         
-        // Função para o movimento do mouse
-        function moveButtons(event) {
-            const mouseX = event.clientX;
-            const mouseY = event.clientY;
-
-            buttons.forEach(button => {
-                const buttonRect = button.getBoundingClientRect();
-                const buttonCenterX = buttonRect.left + buttonRect.width / 2;
-                const buttonCenterY = buttonRect.top + buttonRect.height / 2;
-
-                const distanceX = mouseX - buttonCenterX;
-                const distanceY = mouseY - buttonCenterY;
-                const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
-                const repelDistance = 150; // Distância de repulsão
-                
-                if (distance < repelDistance) {
-                    const angle = Math.atan2(distanceY, distanceX);
-                    const moveDistance = (repelDistance - distance) / 2; // Suavidade do movimento
-                    
-                    const newX = -Math.cos(angle) * moveDistance;
-                    const newY = -Math.sin(angle) * moveDistance;
-                    
-                    button.style.transform = `translate(${newX}px, ${newY}px)`;
-                } else {
-                    button.style.transform = `translate(0, 0)`;
-                }
-            });
+        if (distance < repelDistance) {
+            const angle = Math.atan2(distanceY, distanceX);
+            const moveDistance = (repelDistance - distance) / 2; 
+            
+            const newX = -Math.cos(angle) * moveDistance;
+            const newY = -Math.sin(angle) * moveDistance;
+            
+            buttonToMove.style.transform = `translate(${newX}px, ${newY}px)`;
+        } else {
+            buttonToMove.style.transform = `translate(0, 0)`;
         }
+    }
 
-        // Evento para movimento do mouse
-        document.addEventListener('mousemove', moveButtons);
+    // Função para o comportamento do botão 'Não'
+    function handleStaticButtonClick() {
+        alert('Parabéns, se assumir é um ato de bravura!!');
+    }
 
-        // Ideia para celular: o botão "foge" ao ser tocado
-        buttons.forEach(button => {
-            button.addEventListener('touchstart', function(event) {
-                event.preventDefault(); // Evita o clique
-                
-                // Mover o botão para uma posição aleatória
-                const screenWidth = window.innerWidth - this.offsetWidth;
-                const screenHeight = window.innerHeight - this.offsetHeight;
+    // Evento para movimento do mouse
+    document.addEventListener('mousemove', moveButton);
 
-                const newX = Math.random() * screenWidth - (screenWidth / 2);
-                const newY = Math.random() * screenHeight - (screenHeight / 2);
-                
-                this.style.transform = `translate(${newX}px, ${newY}px)`;
-            });
-        });
+    // Evento para clique no botão 'Não'
+    buttonStatic.addEventListener('click', handleStaticButtonClick);
 
-    </script>
+    // Ideia para celular: o botão "foge" ao ser tocado
+    buttonToMove.addEventListener('touchstart', function(event) {
+        event.preventDefault(); 
+        
+        const screenWidth = window.innerWidth - this.offsetWidth;
+        const screenHeight = window.innerHeight - this.offsetHeight;
+
+        const newX = Math.random() * screenWidth - (screenWidth / 2);
+        const newY = Math.random() * screenHeight - (screenHeight / 2);
+        
+        this.style.transform = `translate(${newX}px, ${newY}px)`;
+    });
+
+    // Evento para toque no botão 'Não' (celular)
+    buttonStatic.addEventListener('touchstart', handleStaticButtonClick);
+
+</script>
 </body>
 </html>
