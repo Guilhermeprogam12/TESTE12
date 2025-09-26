@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Botões Fugitivos</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 2rem;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 2rem;
+            position: relative; /* Para os botões se moverem */
+        }
+
+        .button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.2s ease-out, background-color 0.3s;
+            position: relative;
+            z-index: 10;
+        }
+
+        #button1 {
+            background-color: #2196F3;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #button2 {
+            background-color: #F44336;
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Efeito de hover normal, caso o JavaScript não atue */
+        .button:hover {
+            transform: scale(1.05);
+        }
+
+        @media (max-width: 600px) {
+            .buttons-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Você é hetero?</h1>
+    
+    <div class="buttons-container">
+        <button id="button1" class="button">Sim</button>
+        <button id="button2" class="button">Não</button>
+    </div>
+
+    <script>
+        const buttons = document.querySelectorAll('.button');
+        
+        // Função para o movimento do mouse
+        function moveButtons(event) {
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
+
+            buttons.forEach(button => {
+                const buttonRect = button.getBoundingClientRect();
+                const buttonCenterX = buttonRect.left + buttonRect.width / 2;
+                const buttonCenterY = buttonRect.top + buttonRect.height / 2;
+
+                const distanceX = mouseX - buttonCenterX;
+                const distanceY = mouseY - buttonCenterY;
+                const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+                const repelDistance = 150; // Distância de repulsão
+                
+                if (distance < repelDistance) {
+                    const angle = Math.atan2(distanceY, distanceX);
+                    const moveDistance = (repelDistance - distance) / 2; // Suavidade do movimento
+                    
+                    const newX = -Math.cos(angle) * moveDistance;
+                    const newY = -Math.sin(angle) * moveDistance;
+                    
+                    button.style.transform = `translate(${newX}px, ${newY}px)`;
+                } else {
+                    button.style.transform = `translate(0, 0)`;
+                }
+            });
+        }
+
+        // Evento para movimento do mouse
+        document.addEventListener('mousemove', moveButtons);
+
+        // Ideia para celular: o botão "foge" ao ser tocado
+        buttons.forEach(button => {
+            button.addEventListener('touchstart', function(event) {
+                event.preventDefault(); // Evita o clique
+                
+                // Mover o botão para uma posição aleatória
+                const screenWidth = window.innerWidth - this.offsetWidth;
+                const screenHeight = window.innerHeight - this.offsetHeight;
+
+                const newX = Math.random() * screenWidth - (screenWidth / 2);
+                const newY = Math.random() * screenHeight - (screenHeight / 2);
+                
+                this.style.transform = `translate(${newX}px, ${newY}px)`;
+            });
+        });
+
+    </script>
+</body>
+</html>
