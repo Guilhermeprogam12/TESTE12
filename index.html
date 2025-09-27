@@ -60,18 +60,19 @@
             margin-bottom: 1rem;
         }
 
-        #name-input {
+        #name-input, #sexo-select {
             padding: 10px;
             font-size: 1rem;
             border-radius: 5px;
             border: 1px solid #ccc;
+            margin: 5px;
         }
         
         /* Estilos do Placar */
         #scoreboard {
             margin-top: 3rem;
             width: 80%;
-            max-width: 600px;
+            max-width: 700px;
             background-color: white;
             padding: 20px;
             border-radius: 10px;
@@ -114,6 +115,11 @@
 
     <div class="input-container">
         <input type="text" id="name-input" placeholder="Digite seu nome">
+        <select id="sexo-select">
+            <option value="">Selecione o sexo</option>
+            <option value="Homem">Homem</option>
+            <option value="Mulher">Mulher</option>
+        </select>
     </div>
 
     <h1>Você é Hetero??</h1>
@@ -130,11 +136,11 @@
             <thead>
                 <tr>
                     <th>Nome</th>
+                    <th>Sexo</th>
                     <th>Resposta</th>
                 </tr>
             </thead>
-            <tbody id="scoreboard-body">
-                </tbody>
+            <tbody id="scoreboard-body"></tbody>
         </table>
     </div>
 
@@ -146,59 +152,95 @@
         const buttonToMove = document.getElementById('button1');
         const buttonStatic = document.getElementById('button2');
         const nameInput = document.getElementById('name-input');
+        const sexoSelect = document.getElementById('sexo-select');
         const scoreboardBody = document.getElementById('scoreboard-body');
 
-        // Função para buscar os dados do Airtable e atualizar o placar
+        // Buscar placar
         async function fetchScoreboard() {
             const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
             
             try {
                 const response = await fetch(url, {
                     method: 'GET',
-                    headers: {
-                        'Authorization': `Bearer ${API_KEY}`
-                    }
+                    headers: { 'Authorization': `Bearer ${API_KEY}` }
                 });
                 
-                if (!response.ok) {
-                    throw new Error('Erro ao buscar dados: ' + response.statusText);
-                }
-                
+                if (!response.ok) throw new Error('Erro ao buscar dados: ' + response.statusText);
                 const data = await response.json();
                 
-                // Limpa o conteúdo do placar
                 scoreboardBody.innerHTML = '';
-
-                // Verifica se há dados e os exibe
                 if (data.records.length > 0) {
                     data.records.forEach(record => {
                         const nome = record.fields.nome;
+                        const sexo = record.fields.sexo;
                         const estado = record.fields.estado;
 
-                        // Cria uma nova linha na tabela
                         const row = document.createElement('tr');
-                        const nameCell = document.createElement('td');
-                        const statusCell = document.createElement('td');
-
-                        nameCell.textContent = nome || 'Sem nome';
-                        statusCell.textContent = estado || 'Sem resposta';
-                        
-                        row.appendChild(nameCell);
-                        row.appendChild(statusCell);
-                        
+                        row.innerHTML = `
+                            <td>${nome || 'Sem nome'}</td>
+                            <td>${sexo || 'Não informado'}</td>
+                            <td>${estado || 'Sem resposta'}</td>
+                        `;
                         scoreboardBody.appendChild(row);
                     });
                 } else {
-                    scoreboardBody.innerHTML = '<tr><td colspan="2">Nenhum registro encontrado.</td></tr>';
+                    scoreboardBody.innerHTML = '<tr><td colspan="3">Nenhum registro encontrado.</td></tr>';
                 }
 
             } catch (error) {
                 console.error('Erro ao buscar placar:', error);
-                scoreboardBody.innerHTML = '<tr><td colspan="2">Erro ao carregar o placar.</td></tr>';
+                scoreboardBody.innerHTML = '<tr><td colspan="3">Erro ao carregar o placar.</td></tr>';
             }
         }
 
-        // Função para o movimento do mouse
+        // Enviar dados
+        function sendToAirtable(nome, sexo, estado) {
+            const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "records": [
+                        {
+                            "fields": { nome, sexo, estado }
+                        }
+                    ]
+                })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Erro na requisição: ' + response.statusText);
+                return response.json();
+            })
+            .then(() => fetchScoreboard())
+            .catch(error => console.error('Erro ao enviar dados para o Airtable:', error));
+        }
+
+        // Botão "Não"
+        function handleStaticButtonClick() {
+            const nome = nameInput.value;
+            const sexo = sexoSelect.value;
+
+            if (nome && sexo) {
+                let estado = "";
+
+                if (sexo === "Homem") {
+                    estado = "Viado";
+                } else if (sexo === "Mulher") {
+                    estado = "Lésbica";
+                }
+
+                sendToAirtable(nome, sexo, estado);
+                alert(`Parabéns! Agora você é ${estado}`);
+            } else {
+                alert('Digite seu nome e selecione o sexo antes de continuar.');
+            }
+        }
+
+        // Botão "Sim" (foge)
         function moveButton(event) {
             const mouseX = event.clientX;
             const mouseY = event.clientY;
@@ -221,53 +263,6 @@
             }
         }
 
-        // Função para enviar os dados para o Airtable
-        function sendToAirtable(nome, estado) {
-            const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
-            
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${API_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    "records": [
-                        {
-                            "fields": {
-                                "nome": nome,
-                                "estado": estado
-                            }
-                        }
-                    ]
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Erro na requisição: ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Dados enviados com sucesso:', data);
-                fetchScoreboard(); // Atualiza o placar após o envio
-            })
-            .catch(error => {
-                console.error('Erro ao enviar dados para o Airtable:', error);
-            });
-        }
-
-        // Função para o comportamento do botão 'Não'
-        function handleStaticButtonClick() {
-            const nome = nameInput.value;
-            if (nome) {
-                sendToAirtable(nome, 'Viado');
-                alert('Parabéns! Agora Você é viado');
-            } else {
-                alert('Por favor, digite seu nome antes de continuar.');
-            }
-        }
-
         // Eventos
         document.addEventListener('mousemove', moveButton);
         buttonStatic.addEventListener('click', handleStaticButtonClick);
@@ -281,7 +276,7 @@
         });
         buttonStatic.addEventListener('touchstart', handleStaticButtonClick);
 
-        // Carrega o placar ao carregar a página
+        // Carregar placar
         fetchScoreboard();
     </script>
 </body>
