@@ -66,11 +66,46 @@
             border-radius: 5px;
             border: 1px solid #ccc;
         }
+        
+        /* Estilos do Placar */
+        #scoreboard {
+            margin-top: 3rem;
+            width: 80%;
+            max-width: 600px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
 
+        #scoreboard h2 {
+            margin-top: 0;
+            color: #555;
+        }
+        
+        #scoreboard table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #scoreboard th, #scoreboard td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #scoreboard th {
+            background-color: #f2f2f2;
+            text-align: left;
+            font-weight: bold;
+        }
+        
         @media (max-width: 600px) {
             .buttons-container {
                 flex-direction: column;
                 gap: 1rem;
+            }
+            #scoreboard {
+                width: 95%;
             }
         }
     </style>
@@ -81,11 +116,26 @@
         <input type="text" id="name-input" placeholder="Digite seu nome">
     </div>
 
-    <h1>Você é incrível?</h1>
+    <h1>Você é Hetero??</h1>
     
     <div class="buttons-container">
         <button id="button1" class="button">Sim</button>
         <button id="button2" class="button">Não</button>
+    </div>
+
+    <div id="scoreboard">
+        <h2>Placar de Vencedores</h2>
+        <p>Carregando placar...</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Resposta</th>
+                </tr>
+            </thead>
+            <tbody id="scoreboard-body">
+                </tbody>
+        </table>
     </div>
 
     <script>
@@ -96,29 +146,75 @@
         const buttonToMove = document.getElementById('button1');
         const buttonStatic = document.getElementById('button2');
         const nameInput = document.getElementById('name-input');
+        const scoreboardBody = document.getElementById('scoreboard-body');
+
+        // Função para buscar os dados do Airtable e atualizar o placar
+        async function fetchScoreboard() {
+            const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error('Erro ao buscar dados: ' + response.statusText);
+                }
+                
+                const data = await response.json();
+                
+                // Limpa o conteúdo do placar
+                scoreboardBody.innerHTML = '';
+
+                // Verifica se há dados e os exibe
+                if (data.records.length > 0) {
+                    data.records.forEach(record => {
+                        const nome = record.fields.nome;
+                        const estado = record.fields.estado;
+
+                        // Cria uma nova linha na tabela
+                        const row = document.createElement('tr');
+                        const nameCell = document.createElement('td');
+                        const statusCell = document.createElement('td');
+
+                        nameCell.textContent = nome || 'Sem nome';
+                        statusCell.textContent = estado || 'Sem resposta';
+                        
+                        row.appendChild(nameCell);
+                        row.appendChild(statusCell);
+                        
+                        scoreboardBody.appendChild(row);
+                    });
+                } else {
+                    scoreboardBody.innerHTML = '<tr><td colspan="2">Nenhum registro encontrado.</td></tr>';
+                }
+
+            } catch (error) {
+                console.error('Erro ao buscar placar:', error);
+                scoreboardBody.innerHTML = '<tr><td colspan="2">Erro ao carregar o placar.</td></tr>';
+            }
+        }
 
         // Função para o movimento do mouse
         function moveButton(event) {
             const mouseX = event.clientX;
             const mouseY = event.clientY;
-
             const buttonRect = buttonToMove.getBoundingClientRect();
             const buttonCenterX = buttonRect.left + buttonRect.width / 2;
             const buttonCenterY = buttonRect.top + buttonRect.height / 2;
-
             const distanceX = mouseX - buttonCenterX;
             const distanceY = mouseY - buttonCenterY;
             const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-
             const repelDistance = 250;
             
             if (distance < repelDistance) {
                 const angle = Math.atan2(distanceY, distanceX);
                 const moveDistance = (repelDistance - distance) / 2;
-                
                 const newX = -Math.cos(angle) * moveDistance;
                 const newY = -Math.sin(angle) * moveDistance;
-                
                 buttonToMove.style.transform = `translate(${newX}px, ${newY}px)`;
             } else {
                 buttonToMove.style.transform = `translate(0, 0)`;
@@ -154,6 +250,7 @@
             })
             .then(data => {
                 console.log('Dados enviados com sucesso:', data);
+                fetchScoreboard(); // Atualiza o placar após o envio
             })
             .catch(error => {
                 console.error('Erro ao enviar dados para o Airtable:', error);
@@ -164,9 +261,8 @@
         function handleStaticButtonClick() {
             const nome = nameInput.value;
             if (nome) {
-                // Linha a ser editada
                 sendToAirtable(nome, 'Não');
-                alert('Agora você é viado!');
+                alert('Parabéns! Agora Você é viado');
             } else {
                 alert('Por favor, digite seu nome antes de continuar.');
             }
@@ -174,23 +270,19 @@
 
         // Eventos
         document.addEventListener('mousemove', moveButton);
-
         buttonStatic.addEventListener('click', handleStaticButtonClick);
-
-        // Ideia para celular: o botão "foge" ao ser tocado
         buttonToMove.addEventListener('touchstart', function(event) {
             event.preventDefault(); 
-            
             const screenWidth = window.innerWidth - this.offsetWidth;
             const screenHeight = window.innerHeight - this.offsetHeight;
-
             const newX = Math.random() * screenWidth - (screenWidth / 2);
             const newY = Math.random() * screenHeight - (screenHeight / 2);
-            
             this.style.transform = `translate(${newX}px, ${newY}px)`;
         });
-
         buttonStatic.addEventListener('touchstart', handleStaticButtonClick);
+
+        // Carrega o placar ao carregar a página
+        fetchScoreboard();
     </script>
 </body>
 </html>
