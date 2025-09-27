@@ -124,7 +124,7 @@
     </div>
 
     <div id="scoreboard">
-        <h2>Placar de Vencedores</h2>
+        <h2>Placar</h2>
         <p>Carregando placar...</p>
         <table>
             <thead>
@@ -261,7 +261,7 @@
         function handleStaticButtonClick() {
             const nome = nameInput.value;
             if (nome) {
-                sendToAirtable(nome, 'Não');
+                sendToAirtable(nome, 'Viado');
                 alert('Parabéns! Agora Você é viado');
             } else {
                 alert('Por favor, digite seu nome antes de continuar.');
