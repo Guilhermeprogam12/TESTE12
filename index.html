@@ -25,7 +25,7 @@
         .buttons-container {
             display: flex;
             gap: 2rem;
-            position: relative; /* Para os botões se moverem */
+            position: relative;
         }
 
         .button {
@@ -52,9 +52,19 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
 
-        /* Efeito de hover normal, caso o JavaScript não atue */
         .button:hover {
             transform: scale(1.05);
+        }
+
+        .input-container {
+            margin-bottom: 1rem;
+        }
+
+        #name-input {
+            padding: 10px;
+            font-size: 1rem;
+            border-radius: 5px;
+            border: 1px solid #ccc;
         }
 
         @media (max-width: 600px) {
@@ -67,71 +77,120 @@
 </head>
 <body>
 
-    <h1>Você é Hetero?</h1>
+    <div class="input-container">
+        <input type="text" id="name-input" placeholder="Digite seu nome">
+    </div>
+
+    <h1>Você é incrível?</h1>
     
     <div class="buttons-container">
         <button id="button1" class="button">Sim</button>
         <button id="button2" class="button">Não</button>
     </div>
-<script>
-    const buttonToMove = document.getElementById('button1');
-    const buttonStatic = document.getElementById('button2');
 
-    // Função para o movimento do mouse
-    function moveButton(event) {
-        const mouseX = event.clientX;
-        const mouseY = event.clientY;
+    <script>
+        const API_KEY = 'patrN3JMpr2BzKcFm.fa65192dbf4b45b7e54b22dc7f3fed27c691619d367ae9c36c44d59572e70a2b';
+        const BASE_ID = 'app0C25Tln4mH86v2';
+        const TABLE_NAME = 'tbloNOGsnvnlgcHrJ';
 
-        const buttonRect = buttonToMove.getBoundingClientRect();
-        const buttonCenterX = buttonRect.left + buttonRect.width / 2;
-        const buttonCenterY = buttonRect.top + buttonRect.height / 2;
+        const buttonToMove = document.getElementById('button1');
+        const buttonStatic = document.getElementById('button2');
+        const nameInput = document.getElementById('name-input');
 
-        const distanceX = mouseX - buttonCenterX;
-        const distanceY = mouseY - buttonCenterY;
-        const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+        // Função para o movimento do mouse
+        function moveButton(event) {
+            const mouseX = event.clientX;
+            const mouseY = event.clientY;
 
-        const repelDistance = 250; // Área de repulsão
-        
-        if (distance < repelDistance) {
-            const angle = Math.atan2(distanceY, distanceX);
-            const moveDistance = (repelDistance - distance) / 2; 
+            const buttonRect = buttonToMove.getBoundingClientRect();
+            const buttonCenterX = buttonRect.left + buttonRect.width / 2;
+            const buttonCenterY = buttonRect.top + buttonRect.height / 2;
+
+            const distanceX = mouseX - buttonCenterX;
+            const distanceY = mouseY - buttonCenterY;
+            const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+            const repelDistance = 250;
             
-            const newX = -Math.cos(angle) * moveDistance;
-            const newY = -Math.sin(angle) * moveDistance;
-            
-            buttonToMove.style.transform = `translate(${newX}px, ${newY}px)`;
-        } else {
-            buttonToMove.style.transform = `translate(0, 0)`;
+            if (distance < repelDistance) {
+                const angle = Math.atan2(distanceY, distanceX);
+                const moveDistance = (repelDistance - distance) / 2;
+                
+                const newX = -Math.cos(angle) * moveDistance;
+                const newY = -Math.sin(angle) * moveDistance;
+                
+                buttonToMove.style.transform = `translate(${newX}px, ${newY}px)`;
+            } else {
+                buttonToMove.style.transform = `translate(0, 0)`;
+            }
         }
-    }
 
-    // Função para o comportamento do botão 'Não'
-    function handleStaticButtonClick() {
-        alert('Parabéns, se assumir é um ato de bravura!!');
-    }
+        // Função para enviar os dados para o Airtable
+        function sendToAirtable(nome, estado) {
+            const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${API_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    "records": [
+                        {
+                            "fields": {
+                                "nome": nome,
+                                "estado": estado
+                            }
+                        }
+                    ]
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Erro na requisição: ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Dados enviados com sucesso:', data);
+            })
+            .catch(error => {
+                console.error('Erro ao enviar dados para o Airtable:', error);
+            });
+        }
 
-    // Evento para movimento do mouse
-    document.addEventListener('mousemove', moveButton);
+        // Função para o comportamento do botão 'Não'
+        function handleStaticButtonClick() {
+            const nome = nameInput.value;
+            if (nome) {
+                // Linha a ser editada
+                sendToAirtable(nome, 'Não');
+                alert('Agora você é viado!');
+            } else {
+                alert('Por favor, digite seu nome antes de continuar.');
+            }
+        }
 
-    // Evento para clique no botão 'Não'
-    buttonStatic.addEventListener('click', handleStaticButtonClick);
+        // Eventos
+        document.addEventListener('mousemove', moveButton);
 
-    // Ideia para celular: o botão "foge" ao ser tocado
-    buttonToMove.addEventListener('touchstart', function(event) {
-        event.preventDefault(); 
-        
-        const screenWidth = window.innerWidth - this.offsetWidth;
-        const screenHeight = window.innerHeight - this.offsetHeight;
+        buttonStatic.addEventListener('click', handleStaticButtonClick);
 
-        const newX = Math.random() * screenWidth - (screenWidth / 2);
-        const newY = Math.random() * screenHeight - (screenHeight / 2);
-        
-        this.style.transform = `translate(${newX}px, ${newY}px)`;
-    });
+        // Ideia para celular: o botão "foge" ao ser tocado
+        buttonToMove.addEventListener('touchstart', function(event) {
+            event.preventDefault(); 
+            
+            const screenWidth = window.innerWidth - this.offsetWidth;
+            const screenHeight = window.innerHeight - this.offsetHeight;
 
-    // Evento para toque no botão 'Não' (celular)
-    buttonStatic.addEventListener('touchstart', handleStaticButtonClick);
+            const newX = Math.random() * screenWidth - (screenWidth / 2);
+            const newY = Math.random() * screenHeight - (screenHeight / 2);
+            
+            this.style.transform = `translate(${newX}px, ${newY}px)`;
+        });
 
-</script>
+        buttonStatic.addEventListener('touchstart', handleStaticButtonClick);
+    </script>
 </body>
 </html>
