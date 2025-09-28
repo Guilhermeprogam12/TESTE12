@@ -248,27 +248,7 @@
         }
 
         // Fazer o botão "Sim" correr
-        function moveButton(event) {
-            const mouseX = event.clientX;
-            const mouseY = event.clientY;
-            const buttonRect = buttonYes.getBoundingClientRect();
-            const buttonCenterX = buttonRect.left + buttonRect.width / 2;
-            const buttonCenterY = buttonRect.top + buttonRect.height / 2;
-            const distanceX = mouseX - buttonCenterX;
-            const distanceY = mouseY - buttonCenterY;
-            const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-            const repelDistance = 300;
-            
-            if (distance < repelDistance) {
-                const angle = Math.atan2(distanceY, distanceX);
-                const moveDistance = (repelDistance - distance) / 2;
-                const newX = -Math.cos(angle) * moveDistance;
-                const newY = -Math.sin(angle) * moveDistance;
-                buttonYes.style.transform = `translate(${newX}px, ${newY}px)`;
-            } else {
-                buttonYes.style.transform = `translate(0, 0)`;
-            }
-        }
+
 
         // Eventos
         document.addEventListener('mousemove', moveButton);
