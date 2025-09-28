@@ -1,53 +1,105 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Teste *__*</title>
-<style>
-  body{
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    margin:0;
-    font-family:Arial, sans-serif;
-    background:#f0f0f0;
-    text-align:center;
-  }
-  h1{ color:#333; margin-bottom:2rem; }
-  .buttons-container{ display:flex; gap:2rem; position:relative; }
-  .button{
-    padding:15px 30px;
-    font-size:1.2rem;
-    font-weight:700;
-    border:none;
-    border-radius:50px;
-    cursor:pointer;
-    transition:transform 0.12s ease-out;
-    position:relative;
-    z-index:10;
-    user-select:none;
-  }
-  #button1{ background:#2196F3; color:#fff; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
-  #button2{ background:#F44336; color:#fff; box-shadow:0 4px 6px rgba(0,0,0,0.1); }
-  .input-container{ margin-bottom:1rem; }
-  #name-input, #sexo-select{ padding:10px; font-size:1rem; border-radius:5px; border:1px solid #ccc; margin:5px; }
-  #scoreboard{ margin-top:3rem; width:80%; max-width:700px; background:#fff; padding:20px; border-radius:10px; box-shadow:0 4px 10px rgba(0,0,0,0.1); }
-  #scoreboard table{ width:100%; border-collapse:collapse; }
-  #scoreboard th,#scoreboard td{ padding:12px; border-bottom:1px solid #ddd; text-align:left; }
-  #scoreboard th{ background:#f2f2f2; font-weight:700; }
-  @media(max-width:600px){
-    .buttons-container{ flex-direction:column; gap:1rem; }
-    #scoreboard{ width:95%; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Teste *__*</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      text-align: center;
+    }
+    h1 {
+      color: #333;
+      margin-bottom: 2rem;
+    }
+    .buttons-container {
+      display: flex;
+      gap: 2rem;
+      position: relative;
+    }
+    .button {
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      transition: transform 0.2s ease-out, background-color 0.3s;
+      position: relative;
+      z-index: 10;
+    }
+    #button1 {
+      background-color: #2196F3;
+      color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    #button2 {
+      background-color: #F44336;
+      color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .button:hover {
+      transform: scale(1.05);
+    }
+    .input-container {
+      margin-bottom: 1rem;
+    }
+    #name-input, #sexo-select {
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin: 5px;
+    }
+    #scoreboard {
+      margin-top: 3rem;
+      width: 80%;
+      max-width: 700px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    #scoreboard h2 {
+      margin-top: 0;
+      color: #555;
+    }
+    #scoreboard table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #scoreboard th, #scoreboard td {
+      padding: 12px;
+      border-bottom: 1px solid #ddd;
+    }
+    #scoreboard th {
+      background-color: #f2f2f2;
+      text-align: left;
+      font-weight: bold;
+    }
+    @media (max-width: 600px) {
+      .buttons-container {
+        flex-direction: column;
+        gap: 1rem;
+      }
+      #scoreboard {
+        width: 95%;
+      }
+    }
+  </style>
 </head>
 <body>
 
   <div class="input-container">
-    <input id="name-input" type="text" placeholder="Digite seu nome" />
+    <input type="text" id="name-input" placeholder="Digite seu nome">
     <select id="sexo-select">
       <option value="">Selecione o sexo</option>
       <option value="Homem">Homem</option>
@@ -56,7 +108,7 @@
   </div>
 
   <h1>Você é Hetero??</h1>
-
+  
   <div class="buttons-container">
     <button id="button1" class="button">Sim</button>
     <button id="button2" class="button">Não</button>
@@ -64,162 +116,158 @@
 
   <div id="scoreboard">
     <h2>Placar</h2>
-    <p id="loading-msg">Carregando placar...</p>
+    <p>Carregando placar...</p>
     <table>
       <thead>
-        <tr><th>Nome</th><th>Sexo</th><th>Resposta</th></tr>
+        <tr>
+          <th>Nome</th>
+          <th>Sexo</th>
+          <th>Resposta</th>
+        </tr>
       </thead>
       <tbody id="scoreboard-body"></tbody>
     </table>
   </div>
 
-<script>
-  // credenciais que você forneceu
-  const API_KEY = 'patrN3JMpr2BzKcFm.fa65192dbf4b45b7e54b22dc7f3fed27c691619d367ae9c36c44d59572e70a2b';
-  const BASE_ID = 'app0C25Tln4mH86v2';
-  const TABLE_NAME = 'tbloNOGsnvnlgcHrJ';
+  <script>
+    const API_KEY = 'patrN3JMpr2BzKcFm.fa65192dbf4b45b7e54b22dc7f3fed27c691619d367ae9c36c44d59572e70a2b';
+    const BASE_ID = 'app0C25Tln4mH86v2';
+    const TABLE_NAME = 'tbloNOGsnvnlgcHrJ';
 
-  const buttonYes = document.getElementById('button1');
-  const buttonNo = document.getElementById('button2');
-  const nameInput = document.getElementById('name-input');
-  const sexoSelect = document.getElementById('sexo-select');
-  const scoreboardBody = document.getElementById('scoreboard-body');
-  const loadingMsg = document.getElementById('loading-msg');
+    const buttonYes = document.getElementById('button1');
+    const buttonNo = document.getElementById('button2');
+    const nameInput = document.getElementById('name-input');
+    const sexoSelect = document.getElementById('sexo-select');
+    const scoreboardBody = document.getElementById('scoreboard-body');
 
-  // busca e mostra o placar
-  async function fetchScoreboard(){
-    const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
-    try{
-      const res = await fetch(url, { method:'GET', headers:{ 'Authorization': `Bearer ${API_KEY}` }});
-      if(!res.ok) throw new Error(res.statusText);
-      const data = await res.json();
-      scoreboardBody.innerHTML = '';
-      loadingMsg.style.display = 'none';
-      if(data.records && data.records.length){
-        data.records.forEach(r=>{
-          const nome = r.fields.nome || 'Sem nome';
-          const sexo = r.fields.sexo || 'Não informado';
-          const estado = r.fields.estado || 'Sem resposta';
-          const tr = document.createElement('tr');
-          tr.innerHTML = `<td>${escapeHtml(nome)}</td><td>${escapeHtml(sexo)}</td><td>${escapeHtml(estado)}</td>`;
-          scoreboardBody.appendChild(tr);
+    // Buscar placar
+    async function fetchScoreboard() {
+      const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
+      try {
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: { 'Authorization': `Bearer ${API_KEY}` }
         });
-      } else {
-        scoreboardBody.innerHTML = '<tr><td colspan="3">Nenhum registro encontrado.</td></tr>';
+        if (!response.ok) throw new Error('Erro ao buscar dados: ' + response.statusText);
+        const data = await response.json();
+        
+        scoreboardBody.innerHTML = '';
+        if (data.records.length > 0) {
+          data.records.forEach(record => {
+            const nome = record.fields.nome;
+            const sexo = record.fields.sexo;
+            const estado = record.fields.estado;
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${nome || 'Sem nome'}</td>
+              <td>${sexo || 'Não informado'}</td>
+              <td>${estado || 'Sem resposta'}</td>
+            `;
+            scoreboardBody.appendChild(row);
+          });
+        } else {
+          scoreboardBody.innerHTML = '<tr><td colspan="3">Nenhum registro encontrado.</td></tr>';
+        }
+      } catch (error) {
+        console.error('Erro ao buscar placar:', error);
+        scoreboardBody.innerHTML = '<tr><td colspan="3">Erro ao carregar o placar.</td></tr>';
       }
-    }catch(err){
-      console.error(err);
-      loadingMsg.style.display = 'none';
-      scoreboardBody.innerHTML = '<tr><td colspan="3">Erro ao carregar o placar.</td></tr>';
     }
-  }
 
-  // função segura simples para evitar injeção na tabela (mostra apenas)
-  function escapeHtml(s){
-    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  }
-
-  // envia para Airtable
-  async function sendToAirtable(nome, sexo, estado){
-    const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
-    try{
-      const res = await fetch(url, {
-        method:'POST',
-        headers:{
+    // Enviar dados
+    function sendToAirtable(nome, sexo, estado) {
+      const url = `https://api.airtable.com/v0/${BASE_ID}/${TABLE_NAME}`;
+      fetch(url, {
+        method: 'POST',
+        headers: {
           'Authorization': `Bearer ${API_KEY}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ records:[ { fields: { nome, sexo, estado } } ] })
-      });
-      if(!res.ok) throw new Error(res.statusText);
-      await res.json();
-      fetchScoreboard(); // atualiza
-    }catch(err){
-      console.error('Erro ao enviar:', err);
+        body: JSON.stringify({
+          "records": [
+            {
+              "fields": { nome, sexo, estado }
+            }
+          ]
+        })
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Erro na requisição: ' + response.statusText);
+        return response.json();
+      })
+      .then(() => fetchScoreboard())
+      .catch(error => console.error('Erro ao enviar dados para o Airtable:', error));
     }
-  }
 
-  // botão "Não" -> salva (Homem -> "Gay" (substituto neutro), Mulher -> "Lésbica")
-  function handleNoClick(){
-    const nome = nameInput.value.trim();
-    const sexo = sexoSelect.value;
-    if(!nome || !sexo){ alert('Digite seu nome e selecione o sexo antes de continuar.'); return; }
-    const estado = (sexo === 'Homem') ? 'Viado' : 'Lésbica';
-    sendToAirtable(nome, sexo, estado);
-    alert(`Parabéns! Agora você é ${estado}`);
-  }
-
-  // botão "Sim" -> salva Mentiroso/Mentirosa e mostra "Não pode mentir!"
-  let yesLocked = false;
-  function handleYesClick(){
-    if(yesLocked) return;
-    const nome = nameInput.value.trim();
-    const sexo = sexoSelect.value;
-    if(!nome || !sexo){ alert('Digite seu nome e selecione o sexo antes de continuar.'); return; }
-    yesLocked = true;
-    const estado = (sexo === 'Homem') ? 'Mentiroso' : 'Mentirosa';
-    sendToAirtable(nome, sexo, estado);
-    alert('Não pode mentir!');
-    // desbloqueia após 800ms para evitar cliques repetidos acidentais
-    setTimeout(()=> yesLocked = false, 800);
-  }
-
-  // faz o botão "Sim" fugir do ponteiro (pointermove cobre mouse + toque)
-  function moveButton(e){
-    const clientX = e.clientX;
-    const clientY = e.clientY;
-    if(typeof clientX !== 'number' || typeof clientY !== 'number') return;
-    const rect = buttonYes.getBoundingClientRect();
-    const centerX = rect.left + rect.width/2;
-    const centerY = rect.top + rect.height/2;
-    const dx = clientX - centerX;
-    const dy = clientY - centerY;
-    const dist = Math.hypot(dx, dy);
-    const repelDistance = 180; // distância onde começa a fugir
-    if(dist < repelDistance){
-      const angle = Math.atan2(dy, dx);
-      const moveDistance = (repelDistance - dist) * 0.9; // quão longe mover
-      const newX = -Math.cos(angle) * moveDistance;
-      const newY = -Math.sin(angle) * moveDistance;
-      buttonYes.style.transform = `translate(${Math.round(newX)}px, ${Math.round(newY)}px)`;
-    } else {
-      buttonYes.style.transform = 'translate(0, 0)';
+    // Botão "Não"
+    function handleNoClick() {
+      const nome = nameInput.value.trim();
+      const sexo = sexoSelect.value;
+      if (nome && sexo) {
+        let estado = "";
+        if (sexo === "Homem") {
+          estado = "Viado";
+        } else if (sexo === "Mulher") {
+          estado = "Lésbica";
+        }
+        sendToAirtable(nome, sexo, estado);
+        alert(`Parabéns! Agora você é ${estado}`);
+      } else {
+        alert('Digite seu nome e selecione o sexo antes de continuar.');
+      }
     }
-  }
 
-  // permitimos "acertar" o botão mesmo quando ele foge: checamos pointerdown próximo ao centro do botão
-  document.addEventListener('pointerdown', function(e){
-    const x = e.clientX, y = e.clientY;
-    if(typeof x !== 'number' || typeof y !== 'number') return;
-    const rect = buttonYes.getBoundingClientRect();
-    const inside = x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom;
-    const centerX = rect.left + rect.width/2;
-    const centerY = rect.top + rect.height/2;
-    const distanceToCenter = Math.hypot(x - centerX, y - centerY);
-    const TOLERANCE = 28; // pixels: aceita clique um pouco fora do centro
-    if(inside || distanceToCenter <= TOLERANCE){
-      // evita seleção e comportamento padrão
-      e.preventDefault();
-      handleYesClick();
+    // Botão "Sim"
+    let yesLocked = false;
+    function handleYesClick(){
+      if(yesLocked) return;
+      const nome = nameInput.value.trim();
+      const sexo = sexoSelect.value;
+      if(!nome || !sexo){ 
+        alert('Digite seu nome e selecione o sexo antes de continuar.'); 
+        return; 
+      }
+      yesLocked = true;
+      let estado = "";
+      if(sexo === "Homem"){
+        estado = "Viado! Mentiroso";
+      } else if(sexo === "Mulher"){
+        estado = "Lésbica, Mentirosa";
+      }
+      sendToAirtable(nome, sexo, estado);
+      alert('Não pode mentir!');
+      setTimeout(()=> yesLocked = false, 800);
     }
-  }, { passive:false });
 
-  // também liga click normal ao botão (fallback)
-  buttonYes.addEventListener('click', handleYesClick);
-  buttonNo.addEventListener('click', handleNoClick);
+    // Faz o botão "Sim" correr
+    function moveButton(event) {
+      const mouseX = event.clientX;
+      const mouseY = event.clientY;
+      const buttonRect = buttonYes.getBoundingClientRect();
+      const buttonCenterX = buttonRect.left + buttonRect.width / 2;
+      const buttonCenterY = buttonRect.top + buttonRect.height / 2;
+      const distanceX = mouseX - buttonCenterX;
+      const distanceY = mouseY - buttonCenterY;
+      const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+      const repelDistance = 200;
+      if (distance < repelDistance) {
+        const angle = Math.atan2(distanceY, distanceX);
+        const moveDistance = (repelDistance - distance) / 2;
+        const newX = -Math.cos(angle) * moveDistance;
+        const newY = -Math.sin(angle) * moveDistance;
+        buttonYes.style.transform = `translate(${newX}px, ${newY}px)`;
+      } else {
+        buttonYes.style.transform = `translate(0, 0)`;
+      }
+    }
 
-  // pointermove para o efeito de fugir
-  document.addEventListener('pointermove', moveButton);
+    // Eventos
+    buttonNo.addEventListener('click', handleNoClick);
+    buttonYes.addEventListener('click', handleYesClick);
+    document.addEventListener('mousemove', moveButton);
 
-  // para toque rápido: quando a pessoa tocar diretamente no botão (touchstart), também tenta mover um pouco ou permitir clique
-  buttonYes.addEventListener('touchstart', function(e){
-    // evitar que o botão imediatamente "teleporte" longe antes do touch registrar
-    // não fazemos nada especial aqui — pointerdown já lida com toques
-  }, { passive:false });
-
-  // carrega placar quando abrir
-  fetchScoreboard();
-
-</script>
+    // Carregar placar
+    fetchScoreboard();
+  </script>
 </body>
 </html>
