@@ -149,8 +149,8 @@
         const BASE_ID = 'app0C25Tln4mH86v2';
         const TABLE_NAME = 'tbloNOGsnvnlgcHrJ';
 
-        const buttonToMove = document.getElementById('button1');
-        const buttonStatic = document.getElementById('button2');
+        const buttonYes = document.getElementById('button1');
+        const buttonNo = document.getElementById('button2');
         const nameInput = document.getElementById('name-input');
         const sexoSelect = document.getElementById('sexo-select');
         const scoreboardBody = document.getElementById('scoreboard-body');
@@ -220,19 +220,12 @@
         }
 
         // Botão "Não"
-        function handleStaticButtonClick() {
+        function handleNoClick() {
             const nome = nameInput.value;
             const sexo = sexoSelect.value;
 
             if (nome && sexo) {
-                let estado = "";
-
-                if (sexo === "Homem") {
-                    estado = "Viado";
-                } else if (sexo === "Mulher") {
-                    estado = "Lésbica";
-                }
-
+                let estado = (sexo === "Homem") ? "Viado" : "Lésbica";
                 sendToAirtable(nome, sexo, estado);
                 alert(`Parabéns! Agora você é ${estado}`);
             } else {
@@ -240,41 +233,47 @@
             }
         }
 
-        // Botão "Sim" (foge)
+        // Botão "Sim"
+        function handleYesClick() {
+            const nome = nameInput.value;
+            const sexo = sexoSelect.value;
+
+            if (nome && sexo) {
+                let estado = (sexo === "Homem") ? "Mentiroso" : "Mentirosa";
+                sendToAirtable(nome, sexo, estado);
+                alert("Não pode mentir!");
+            } else {
+                alert('Digite seu nome e selecione o sexo antes de continuar.');
+            }
+        }
+
+        // Fazer o botão "Sim" correr
         function moveButton(event) {
             const mouseX = event.clientX;
             const mouseY = event.clientY;
-            const buttonRect = buttonToMove.getBoundingClientRect();
+            const buttonRect = buttonYes.getBoundingClientRect();
             const buttonCenterX = buttonRect.left + buttonRect.width / 2;
             const buttonCenterY = buttonRect.top + buttonRect.height / 2;
             const distanceX = mouseX - buttonCenterX;
             const distanceY = mouseY - buttonCenterY;
             const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-            const repelDistance = 350;
+            const repelDistance = 300;
             
             if (distance < repelDistance) {
                 const angle = Math.atan2(distanceY, distanceX);
                 const moveDistance = (repelDistance - distance) / 2;
                 const newX = -Math.cos(angle) * moveDistance;
                 const newY = -Math.sin(angle) * moveDistance;
-                buttonToMove.style.transform = `translate(${newX}px, ${newY}px)`;
+                buttonYes.style.transform = `translate(${newX}px, ${newY}px)`;
             } else {
-                buttonToMove.style.transform = `translate(0, 0)`;
+                buttonYes.style.transform = `translate(0, 0)`;
             }
         }
 
         // Eventos
         document.addEventListener('mousemove', moveButton);
-        buttonStatic.addEventListener('click', handleStaticButtonClick);
-        buttonToMove.addEventListener('touchstart', function(event) {
-            event.preventDefault(); 
-            const screenWidth = window.innerWidth - this.offsetWidth;
-            const screenHeight = window.innerHeight - this.offsetHeight;
-            const newX = Math.random() * screenWidth - (screenWidth / 2);
-            const newY = Math.random() * screenHeight - (screenHeight / 2);
-            this.style.transform = `translate(${newX}px, ${newY}px)`;
-        });
-        buttonStatic.addEventListener('touchstart', handleStaticButtonClick);
+        buttonNo.addEventListener('click', handleNoClick);
+        buttonYes.addEventListener('click', handleYesClick);
 
         // Carregar placar
         fetchScoreboard();
