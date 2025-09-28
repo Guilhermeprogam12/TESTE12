@@ -249,7 +249,7 @@
       const distanceX = mouseX - buttonCenterX;
       const distanceY = mouseY - buttonCenterY;
       const distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
-      const repelDistance = 350;
+      const repelDistance = 150;
       if (distance < repelDistance) {
         const angle = Math.atan2(distanceY, distanceX);
         const moveDistance = (repelDistance - distance) / 2;
